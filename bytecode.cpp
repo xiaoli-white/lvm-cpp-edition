@@ -556,10 +556,10 @@ namespace lvm::bytecode
             return ATOMIC_NEG_DOUBLE;
         if (code == "ATOMIC_NEG_FLOAT")
             return ATOMIC_NEG_FLOAT;
-        if (code == "INVOKE_NATIVE")
-            return INVOKE_NATIVE;
         if (code == "JUMP_IF")
             return JUMP_IF;
+        if (code == "INVOKE_NATIVE")
+            return INVOKE_NATIVE;
         throw std::runtime_error("Unknown instruction: " + code);
     }
 }

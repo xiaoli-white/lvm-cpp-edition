@@ -109,18 +109,17 @@ namespace lvm
         if (sig == SIGSEGV)
         {
             void* faultAddress = info->si_addr;
-            const Memory* memory = currentVirtualMachine->memory;
 
-            if (faultAddress >= memory->heap &&
+            if (const Memory* memory = currentVirtualMachine->memory; faultAddress >= memory->heap &&
                 faultAddress < reinterpret_cast<void*>(reinterpret_cast<int64_t>(memory->heap) + memory->heapSize))
             {
-                void* pageBase = reinterpret_cast<void*>((size_t)faultAddress & ~(PAGE_SIZE - 1));
-                size_t pageIndex = ((char*)pageBase - (char*)memory->heap) / PAGE_SIZE;
-                if (!((bool*)memory->metadata)[pageIndex])
+                auto pageBase = reinterpret_cast<void*>(reinterpret_cast<size_t>(faultAddress) & ~(PAGE_SIZE - 1));
+                size_t pageIndex = (static_cast<char*>(pageBase) - static_cast<char*>(memory->heap)) / PAGE_SIZE;
+                if (!static_cast<bool*>(memory->metadata)[pageIndex])
                 {
                     if (mprotect(pageBase, PAGE_SIZE, PROT_READ | PROT_WRITE) == 0)
                     {
-                        ((bool*)memory->metadata)[pageIndex] = true;
+                        static_cast<bool*>(memory->metadata)[pageIndex] = true;
                         memset(pageBase, 0, PAGE_SIZE);
                         return;
                     }
@@ -134,7 +133,7 @@ namespace lvm
 
     void InstallPageFaultHandler()
     {
-        struct sigaction sa;
+        struct sigaction sa{};
         sa.sa_sigaction = PageFaultHandler;
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = SA_SIGINFO;
@@ -148,7 +147,7 @@ namespace lvm
 
     Memory::Memory(uint64_t heapSize) : heapSize(heapSize)
     {
-        heap = mmap(NULL, heapSize,PROT_NONE,MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
+        heap = mmap(nullptr, heapSize,PROT_NONE,MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
 
         if (heap == MAP_FAILED)
         {
@@ -171,7 +170,7 @@ namespace lvm
     bool Memory::setReadonly(uint64_t address, uint64_t size)
     {
         size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-        void* pageBase = (void*)(address & ~(PAGE_SIZE - 1));
+        auto pageBase = reinterpret_cast<void*>(address & ~(PAGE_SIZE - 1));
 
         if (mprotect(pageBase, size, PROT_READ) == -1)
         {
@@ -184,7 +183,7 @@ namespace lvm
     bool Memory::setReadwrite(uint64_t address, uint64_t size)
     {
         size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-        void* pageBase = (void*)(address & ~(PAGE_SIZE - 1));
+        auto pageBase = reinterpret_cast<void*>(address & ~(PAGE_SIZE - 1));
 
         if (mprotect(pageBase, size, PROT_READ | PROT_WRITE) == -1)
         {

@@ -33,17 +33,17 @@ namespace lvm
         v.push_back('m');
         v.push_back('e');
         v.push_back(ENDIAN);
-        for (int i = 0; i < sizeof(LVM_VERSION); i++)v.push_back(LVM_VERSION >> (i * 8));
-        for (int i = 0; i < sizeof(textLength); i++)v.push_back(textLength >> (i * 8));
-        for (int i = 0; i < textLength; i++)v.push_back(text[i]);
-        for (int i = 0; i < sizeof(rodataLength); i++)v.push_back(rodataLength >> (i * 8));
-        for (int i = 0; i < rodataLength; i++)v.push_back(rodata[i]);
-        for (int i = 0; i < sizeof(dataLength); i++)v.push_back(dataLength >> (i * 8));
-        for (int i = 0; i < dataLength; i++)v.push_back(data[i]);
-        for (int i = 0; i < sizeof(bssLength); i++)v.push_back(bssLength >> (i * 8));
-        for (int i = 0; i < sizeof(entryPoint); i++)v.push_back(entryPoint >> (i * 8));
+        for (uint64_t i = 0; i < sizeof(LVM_VERSION); i++)v.push_back(LVM_VERSION >> (i * 8));
+        for (uint64_t i = 0; i < sizeof(textLength); i++)v.push_back(textLength >> (i * 8));
+        for (uint64_t i = 0; i < textLength; i++)v.push_back(text[i]);
+        for (uint64_t i = 0; i < sizeof(rodataLength); i++)v.push_back(rodataLength >> (i * 8));
+        for (uint64_t i = 0; i < rodataLength; i++)v.push_back(rodata[i]);
+        for (uint64_t i = 0; i < sizeof(dataLength); i++)v.push_back(dataLength >> (i * 8));
+        for (uint64_t i = 0; i < dataLength; i++)v.push_back(data[i]);
+        for (uint64_t i = 0; i < sizeof(bssLength); i++)v.push_back(bssLength >> (i * 8));
+        for (uint64_t i = 0; i < sizeof(entryPoint); i++)v.push_back(entryPoint >> (i * 8));
         auto* raw = new uint8_t[v.size()];
-        for (int i = 0; i < v.size(); i++)raw[i] = v[i];
+        for (uint64_t i = 0; i < v.size(); i++)raw[i] = v[i];
         return raw;
     }
 
@@ -52,29 +52,32 @@ namespace lvm
         uint64_t index = 0;
         if (raw[index++] != 'l' || raw[index++] != 'v' || raw[index++] != 'm' || raw[index++] != 'e')
         {
+            throw std::runtime_error("Invalid module");
             return nullptr;
         }
         if (raw[index++] != ENDIAN)
         {
+            throw std::runtime_error("Invalid module");
             return nullptr;
         }
         if ((*reinterpret_cast<const uint64_t*>(&raw[index])) != LVM_VERSION)
         {
+            throw std::runtime_error("Invalid module");
             return nullptr;
         }
         index += 8;
         const uint64_t textLength = *reinterpret_cast<const uint64_t*>(&raw[index]);
         index += 8;
         auto* text = new uint8_t[textLength]{};
-        for (int i = 0; i < textLength; i++)text[i] = raw[index++];
+        for (uint64_t i = 0; i < textLength; i++)text[i] = raw[index++];
         const uint64_t rodataLength = *reinterpret_cast<const uint64_t*>(&raw[index]);
         index += 8;
         auto* rodata = new uint8_t[rodataLength]{};
-        for (int i = 0; i < rodataLength; i++)rodata[i] = raw[index++];
+        for (uint64_t i = 0; i < rodataLength; i++)rodata[i] = raw[index++];
         const uint64_t dataLength = *reinterpret_cast<const uint64_t*>(&raw[index]);
         index += 8;
         auto* data = new uint8_t[dataLength]{};
-        for (int i = 0; i < dataLength; i++)data[i] = raw[index++];
+        for (uint64_t i = 0; i < dataLength; i++)data[i] = raw[index++];
         const uint64_t bssLength = *reinterpret_cast<const uint64_t*>(&raw[index]);
         index += 8;
         const uint64_t entryPoint = *reinterpret_cast<const uint64_t*>(&raw[index]);
