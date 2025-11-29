@@ -7,7 +7,7 @@
 #include "bytecode.h"
 #include "exception.h"
 #include "vm.h"
-#ifdef  __WIN32
+#ifdef  _WIN32
 #include <windows.h>
 #else
 #include <signal.h>
