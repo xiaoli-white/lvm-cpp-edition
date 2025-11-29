@@ -19,6 +19,7 @@
 #include <sys/mman.h>
 #include <setjmp.h>
 #include <errno.h>
+#include <unistd.h>
 #ifdef __APPLE__
 #define PAGE_SIZE sysconf(_SC_PAGE_SIZE)
 #else
