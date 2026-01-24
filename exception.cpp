@@ -4,8 +4,6 @@
 
 #include "exception.h"
 
-#include <utility>
-
 namespace lvm
 {
     VMException::VMException(std::string message): std::runtime_error(message)

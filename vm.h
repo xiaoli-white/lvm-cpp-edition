@@ -15,11 +15,8 @@
 #ifdef __WIN32
 #include <Windows.h>
 #else
-#include <signal.h>
-#include <sys/mman.h>
-#include <setjmp.h>
-#include <errno.h>
-#include <unistd.h>
+#include <csignal>
+#include <csetjmp>
 #ifdef __APPLE__
 #define PAGE_SIZE sysconf(_SC_PAGE_SIZE)
 #else

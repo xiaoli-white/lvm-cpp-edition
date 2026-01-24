@@ -10,10 +10,8 @@
 #ifdef  _WIN32
 #include <windows.h>
 #else
-#include <signal.h>
+#include <csignal>
 #include <sys/mman.h>
-#include <setjmp.h>
-#include <errno.h>
 #endif
 
 
